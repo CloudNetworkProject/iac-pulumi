@@ -1,6 +1,3 @@
-name: iac-pulumi-fork
-runtime:
-  name: nodejs
-  options:
-    typescript: false
-description: A minimal AWS JavaScript Pulumi program
+name: iac_pulumi_
+runtime: nodejs
+description: A minimal AWS TypeScript Pulumi program
