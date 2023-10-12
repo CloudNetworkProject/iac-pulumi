@@ -1,0 +1,16 @@
+{
+    "name": "iac_pulumi_",
+    "main": "index.ts",
+    "devDependencies": {
+        "@types/big-integer": "^0.0.31",
+        "@types/ip": "^1.1.1",
+        "@types/node": "^16"
+    },
+    "dependencies": {
+        "@pulumi/aws": "^5.0.0",
+        "@pulumi/awsx": "^1.0.0",
+        "@pulumi/pulumi": "^3.0.0",
+        "big-integer": "^1.6.51",
+        "ip": "^1.1.8"
+    }
+}

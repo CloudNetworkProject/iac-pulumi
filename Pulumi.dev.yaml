@@ -1,0 +1,19 @@
+encryptionsalt: v1:ODzY9Z9jl8Y=:v1:Ptwj0i4khwtLsFZK:nRPRGNalJropyXWesarjsukS+xzbPw==
+config:
+  aws:profile: dev
+  aws:region: us-east-1
+  iac-aws:bits_for_each_subnet: "24"
+  iac-aws:internet_gateway_attachment_name: custom-gw-attachment
+  iac-aws:internet_gateway_name: custom-gw
+  iac-aws:max_availability_zones: "3"
+  iac-aws:private_route_table_name: private-route-table
+  iac-aws:private_route_table_subnets_association_prefix: private-rt-assoc
+  iac-aws:private_subnets_prefix: private-subnet
+  iac-aws:public_destination_cidr: 0.0.0.0/0
+  iac-aws:public_route_name: public-route
+  iac-aws:public_route_table_name: public-route-table
+  iac-aws:public_route_table_subnets_association_prefix: public-rt-assoc
+  iac-aws:public_subnets_prefix: public-subnet
+  iac-aws:vpc_cidr: 10.0.0.0/16
+  iac-aws:vpc_instance_tenancy: default
+  iac-aws:vpc_name: custom-vpc
