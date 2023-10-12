@@ -1,0 +1,20 @@
+encryptionsalt: v1:WlAXJLBqIkw=:v1:6eMXk5476mc3IWJ1:EjT4pYF2k1JmDoC2WPOL5huaBuLaCg==
+config:
+  aws:region: us-west-2
+  iac-pulumi-fork:availabilityZones:
+    - us-east-1a
+    - us-east-1b
+    - us-east-1c
+  iac-pulumi-fork:cidrBlock: 10.0.0.0/16
+  iac-pulumi-fork:privateSubnetCIDR:
+    - 10.0.10.0/24
+    - 10.0.20.0/24
+    - 10.0.30.0/24
+  iac-pulumi-fork:publicCidrBlock: 0.0.0.0/0
+  iac-pulumi-fork:publicSubnetCIDR:
+    - 10.0.1.0/24
+    - 10.0.2.0/24
+    - 10.0.3.0/24
+  iac-pulumi-fork:region: us-east-1
+  iac-pulumi-fork:tags:
+    Name: Created from Script
