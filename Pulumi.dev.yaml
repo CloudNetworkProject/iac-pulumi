@@ -17,3 +17,17 @@ config:
   iac-aws:vpc_cidr: 10.0.0.0/16
   iac-aws:vpc_instance_tenancy: default
   iac-aws:vpc_name: custom-vpc
+  iac-aws:securityGroupDescription: Application security group
+  iac-aws:securityGroupName: appSecurityGroup
+  iac-aws:allowedIngressPorts: "22,80,443,8080"
+  iac-aws:allowedIngressCIDRs: "0.0.0.0/0"
+  iac-aws:instanceType: t2.micro
+  iac-aws:imageId: ami-01b68dca67310b8b0
+  iac-aws:keyName: ec2_dev
+  iac-aws:volumeSize: 25
+  iac-aws:volumeType: gp2
+  iac-aws:deleteOnTermination: "true"
+  iac-aws:shutdownBehavior: stop
+  iac-aws:disableApiTermination: "false"
+  iac-aws:ec2Name: MyEC2Instance
+
