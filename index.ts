@@ -1,4 +1,3 @@
-import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 import * as ipModule from "ip";
 
@@ -196,9 +195,11 @@ function getSubnetRanges(cidr: string, subnetsCount: number, bits: number): stri
         }
 
         return subnetList;
+
     } catch (error) {
         return error as Error;
     }
 }
 
 setupInfrastructure();
+
