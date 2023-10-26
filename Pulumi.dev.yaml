@@ -22,7 +22,7 @@ config:
   proj-aws-setup:allowedPorts: "22,80,443,3000"
   proj-aws-setup:allowedCIDRs: "0.0.0.0/0"
   proj-aws-setup:instanceType: t2.small
-  proj-aws-setup:imageId: ami-03541f825b3c7c197
+  proj-aws-setup:imageId: ami-0c233b6a8bf806d6a
   proj-aws-setup:keyName: ec2_dev_key
   proj-aws-setup:volumeSize: 30
   proj-aws-setup:volumeType: gp2
