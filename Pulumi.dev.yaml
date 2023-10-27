@@ -2,33 +2,44 @@ encryptionsalt: v1:ODzY9Z9jl8Y=:v1:Ptwj0i4khwtLsFZK:nRPRGNalJropyXWesarjsukS+xzb
 config:
   aws:profile: dev
   aws:region: us-east-1
-  proj-aws-setup:subnet_bits: "24"
-  proj-aws-setup:gateway_attach_name: main-gw-attach
-  proj-aws-setup:gateway_name: main-gw
-  proj-aws-setup:max_zones: "3"
-  proj-aws-setup:priv_route_table_name: priv-rt-table
-  proj-aws-setup:priv_rt_subnets_assoc_prefix: priv-rt-table-assoc
-  proj-aws-setup:priv_subnets_prefix: priv-subnet-name
-  proj-aws-setup:main_dest_cidr: 0.0.0.0/0
-  proj-aws-setup:main_route_name: main-route-config
-  proj-aws-setup:pub_route_table_name: pub-rt-table
-  proj-aws-setup:pub_rt_subnets_assoc_prefix: pub-rt-table-assoc
-  proj-aws-setup:pub_subnets_prefix: pub-subnet-name
-  proj-aws-setup:primary_vpc_cidr: 10.1.0.0/16
-  proj-aws-setup:primary_vpc_instance_tenancy: default
-  proj-aws-setup:primary_vpc_name: primary-vpc-setup
-  proj-aws-setup:sgDescription: App SG
-  proj-aws-setup:sgName: applicationSg
-  proj-aws-setup:allowedPorts: "22,80,443,3000"
-  proj-aws-setup:allowedCIDRs: "0.0.0.0/0"
-  proj-aws-setup:instanceType: t2.small
-  proj-aws-setup:imageId: ami-0c233b6a8bf806d6a
-  proj-aws-setup:keyName: ec2_dev_key
-  proj-aws-setup:volumeSize: 30
-  proj-aws-setup:volumeType: gp2
-  proj-aws-setup:deleteOnTermination: "true"
-  proj-aws-setup:disableApiTerm: "false"
-  proj-aws-setup:ec2TagName: MyPrimaryEC2
-
-  
-
+  iac-aws:bits_for_each_subnet: "24"
+  iac-aws:internet_gateway_attachment_name: custom-gw-attachment
+  iac-aws:internet_gateway_name: custom-gw
+  iac-aws:max_availability_zones: "3"
+  iac-aws:private_route_table_name: private-route-table
+  iac-aws:private_route_table_subnets_association_prefix: private-rt-assoc
+  iac-aws:private_subnets_prefix: private-subnet
+  iac-aws:public_destination_cidr: 0.0.0.0/0
+  iac-aws:public_route_name: public-route
+  iac-aws:public_route_table_name: public-route-table
+  iac-aws:public_route_table_subnets_association_prefix: public-rt-assoc
+  iac-aws:public_subnets_prefix: public-subnet
+  iac-aws:vpc_cidr: 10.0.0.0/16
+  iac-aws:vpc_instance_tenancy: default
+  iac-aws:vpc_name: custom-vpc
+  iac-aws:securityGroupDescription: Application security group
+  iac-aws:securityGroupName: appSecurityGroup
+  iac-aws:allowedIngressPorts: "22,80,443,8080"
+  iac-aws:allowedEgressPorts: "22,80,443,5432"
+  iac-aws:allowedIngressCIDRs: "0.0.0.0/0"
+  iac-aws:allowedEgressCIDRs: "0.0.0.0/0"
+  iac-aws:instanceType: t2.micro
+  iac-aws:imageId: ami-09a8cb0fb0db54735
+  iac-aws:keyName: ec2_dev_key
+  iac-aws:volumeSize: 25
+  iac-aws:volumeType: gp2
+  iac-aws:deleteOnTermination: "true"
+  iac-aws:shutdownBehavior: stop
+  iac-aws:disableApiTermination: "false"
+  iac-aws:ec2Name: EC2DemoRDS
+  iac-aws:envType: pulumi
+  iac-aws:dbPort: 5432
+  iac-aws:dbUser: csye6225
+  iac-aws:dbSecurityGroupName: databaseSecurityGroup
+  iac-aws:dbPassword: postgres
+  iac-aws:dbName: csye6225
+  iac-aws:dbInstanceIdentifier: csye6225
+  iac-aws:dbSubnetGroupName: private_subnet_for_rds
+  iac-aws:multiAZDeployment: "false"
+  iac-aws:dbParameterGroupName: customdb-parameter-group
+  iac-aws:allocatedStorage: 20
