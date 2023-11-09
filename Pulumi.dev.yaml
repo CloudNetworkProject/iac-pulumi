@@ -55,7 +55,7 @@ config:
   iac-aws:cloudWatchAgentPolicyAttachmentName: "cloudWatchAgentPolicyAttachment"
   iac-aws:instanceProfileName: "instanceProfile"
 
-change 
+change:
   aws:profile: dev
   iac-aws:domainName: "dev.chanducloud.me"
   iac-aws:hostedZoneId: "Z098998426M4YR44FSTVB"
