@@ -24,22 +24,40 @@ config:
   iac-aws:allowedIngressCIDRs: "0.0.0.0/0"
   iac-aws:allowedEgressCIDRs: "0.0.0.0/0"
   iac-aws:instanceType: t2.micro
-  iac-aws:imageId: ami-09a8cb0fb0db54735
+  iac-aws:imageId: ami-0b7f37da7a4c2c862
   iac-aws:keyName: ec2_dev_key
   iac-aws:volumeSize: 25
   iac-aws:volumeType: gp2
   iac-aws:deleteOnTermination: "true"
   iac-aws:shutdownBehavior: stop
   iac-aws:disableApiTermination: "false"
-  iac-aws:ec2Name: EC2DemoRDS
+  iac-aws:ec2Name: EC2DevRDS
   iac-aws:envType: pulumi
   iac-aws:dbPort: 5432
   iac-aws:dbUser: csye6225
   iac-aws:dbSecurityGroupName: databaseSecurityGroup
   iac-aws:dbPassword: postgres
+  # We don't store password in plaintext in yaml.
+  # Use `pulumi config set --secret iac-aws:dbPassword YOUR_PASSWORD` in the CLI to set it.
   iac-aws:dbName: csye6225
   iac-aws:dbInstanceIdentifier: csye6225
   iac-aws:dbSubnetGroupName: private_subnet_for_rds
   iac-aws:multiAZDeployment: "false"
   iac-aws:dbParameterGroupName: customdb-parameter-group
   iac-aws:allocatedStorage: 20
+  iac-aws:applicationPort: "8080"
+  iac-aws:domainName: "dev.chanducloud.me"
+  iac-aws:route53ARecordName: route53ARecordName
+  iac-aws:hostedZoneId: "Z098998426M4YR44FSTVB"
+  iac-aws:ttl: 60
+  iac-aws:cloudWatchAgentServerPolicyName: "CloudWatchAgentServerPolicy"
+  iac-aws:ec2RoleName: "ec2Role"
+  iac-aws:cloudWatchAgentPolicyAttachmentName: "cloudWatchAgentPolicyAttachment"
+  iac-aws:instanceProfileName: "instanceProfile"
+
+change 
+  aws:profile: dev
+  iac-aws:domainName: "dev.chanducloud.me"
+  iac-aws:hostedZoneId: "Z098998426M4YR44FSTVB"
+  iac-aws:imageId: ami-0b7f37da7a4c2c862
+  iac-aws:keyName: ec2_dev_key
