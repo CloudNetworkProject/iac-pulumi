@@ -24,7 +24,7 @@ config:
   iac-aws:allowedIngressCIDRs: "0.0.0.0/0"
   iac-aws:allowedEgressCIDRs: "0.0.0.0/0"
   iac-aws:instanceType: t2.micro
-  iac-aws:imageId: ami-0b7f37da7a4c2c862
+  iac-aws:imageId: ami-0b0e4a92cc0c3f24c
   iac-aws:keyName: ec2_dev_key
   iac-aws:volumeSize: 25
   iac-aws:volumeType: gp2
@@ -54,10 +54,12 @@ config:
   iac-aws:ec2RoleName: "ec2Role"
   iac-aws:cloudWatchAgentPolicyAttachmentName: "cloudWatchAgentPolicyAttachment"
   iac-aws:instanceProfileName: "instanceProfile"
+  iac-aws:launchConfigurationName: asg_launch_config
+  iac-aws:autoScalingGroupName: webAppAutoScalingGroup
+  iac-aws:autoScalingCooldown: 60
+  iac-aws:autoScalingMinSize: 1
+  iac-aws:autoScalingMaxSize: 3
+  iac-aws:autoScalingDesiredCapacity: 1
+  iac-aws:loadBalancerSecurityGroupName: webAppLoadBalancerSecurityGroup
+  iac-aws:loadBalancerAllowedIngressPorts: "80,443"
 
-change:
-  aws:profile: dev
-  iac-aws:domainName: "dev.chanducloud.me"
-  iac-aws:hostedZoneId: "Z098998426M4YR44FSTVB"
-  iac-aws:imageId: ami-0b7f37da7a4c2c862
-  iac-aws:keyName: ec2_dev_key
