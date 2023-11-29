@@ -1,7 +1,19 @@
 encryptionsalt: v1:ODzY9Z9jl8Y=:v1:Ptwj0i4khwtLsFZK:nRPRGNalJropyXWesarjsukS+xzbPw==
 config:
+  iac-aws:MAILGUN_API_KEY: "11f7220dfbfb587c71b2d99466658252-30b58138-08176bb7"
+  iac-aws:dynamoDBTableName: "webapp_Mail_Tracker"
+  iac-aws:emailDomainName: "chanducloud.me"
+  iac-aws:gcpServiceAccountRolePermissions: "roles/storage.admin"
+  iac-aws:lambdaFilePath: "/Users/chandukongara/Downloads/Poornachandra_Kongara_002778509_09/serverless/"
+  iac-aws:lambdaIAMRoleCloudwatchPolicyARN: "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  iac-aws:lambdaIAMRoleDynamoDBPolicyARN: "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+  iac-aws:snsTopicName: "webappTopic"
+  iac-aws:gcpBucketName: assignments
+  iac-aws:gcpProjectID: development-406517
+  iac-aws:gcpRegion: us-east1
   aws:profile: dev
   aws:region: us-east-1
+  gcp:project: development-406517
   iac-aws:bits_for_each_subnet: "24"
   iac-aws:internet_gateway_attachment_name: custom-gw-attachment
   iac-aws:internet_gateway_name: custom-gw
@@ -24,7 +36,7 @@ config:
   iac-aws:allowedIngressCIDRs: "0.0.0.0/0"
   iac-aws:allowedEgressCIDRs: "0.0.0.0/0"
   iac-aws:instanceType: t2.micro
-  iac-aws:imageId: ami-0b0e4a92cc0c3f24c
+  iac-aws:imageId: ami-072d24b1e721c100e
   iac-aws:keyName: ec2_dev_key
   iac-aws:volumeSize: 25
   iac-aws:volumeType: gp2
