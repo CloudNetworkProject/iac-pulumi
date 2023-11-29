@@ -1,6 +1,13 @@
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 import * as ip from "ip";
+import * as gcp from "@pulumi/gcp";
+import * as path from "path";
+ 
+//Create an SNS topic
+
+ 
+
  
 const config = new pulumi.Config("iac-aws");
  
@@ -13,6 +20,21 @@ const publicRouteTableName = config.require("public_route_table_name");
 const privateRouteTableName = config.require("private_route_table_name");
 const maxAvailabilityZones = config.getNumber("max_availability_zones");
 const bitsForEachSubnet = config.getNumber("bits_for_each_subnet");
+// Set your GCP project ID
+const projectId = config.require("gcpProjectID");
+const gcpRegion = config.require("gcpRegion")
+const gcpBucketName = config.require("gcpBucketName")
+const gcpServiceAccountRolePermissions = config.require("gcpServiceAccountRolePermissions")
+ 
+// Lambda
+const lambdaIAMRoleCloudwatchPolicyARN = config.require("lambdaIAMRoleCloudwatchPolicyARN");
+const lambdaIAMRoleDynamoDBPolicyARN = config.require("lambdaIAMRoleDynamoDBPolicyARN");
+const lambdaFilePath = config.require("lambdaFilePath");
+const snsTopicName = config.require("snsTopicName");
+const mailGunAPIKEY = config.require("MAILGUN_API_KEY");
+const emailDomainName = config.require("emailDomainName");
+ 
+const dynamoDBTableName = config.require("dynamoDBTableName");
  
 const publicRouteName = config.require("public_route_name");
 const publicDestinationCidr = config.require("public_destination_cidr");
@@ -50,6 +72,10 @@ const autoScalingMinSize = config.getNumber("autoScalingMinSize") || 1;
 const autoScalingMaxSize = config.getNumber("autoScalingMaxSize") || 3;
 const autoScalingDesiredCapacity = config.getNumber("autoScalingDesiredCapacity") || 1;
 const loadBalancerAllowedIngressPorts = config.require("loadBalancerAllowedIngressPorts").split(",");
+
+
+const snsTopic = new aws.sns.Topic(snsTopicName);
+const snsTopicArn = snsTopic.arn.apply(arn => arn);
  
 // Create VPC
 const vpc = new aws.ec2.Vpc(vpcName, {
@@ -260,6 +286,7 @@ echo "DB_PASSWORD=${rdsPassword}" >> /home/webapp_user/webapp/.env
 echo "DB_NAME=${dbName}" >> /home/webapp_user/webapp/.env
 echo "DB_PORT=${dbPort}" >> /home/webapp_user/webapp/.env
 echo "ENV_TYPE=${ENV_TYPE}" >> /home/webapp_user/webapp/.env
+echo "SNS_Topic_ARN=${snsTopicArn}" >> /home/webapp_user/webapp/.env
  
 # Configure the CloudWatch Agent
 sudo /usr/bin/amazon-cloudwatch-agent-ctl \\
@@ -294,7 +321,7 @@ sudo systemctl restart csye6225_webapp
                     {
                         Effect: "Allow",
                         Action: "ssm:GetParameter",
-                        Resource: "arn:aws:ssm:::parameter/AmazonCloudWatch-*",
+                        Resource: "arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*",
                     },
                 ],
             },
@@ -510,5 +537,113 @@ function calculateCIDRSubnets(parentCIDR: string, numSubnets: number, bitsToMask
         return error as Error;
     }
 }
+// Create a Google Cloud Storage bucket
+const bucket = new gcp.storage.Bucket(gcpBucketName, {
+    forceDestroy: true,
+    location: gcpRegion,
+});
+ 
+// Create a Google Service Account
+const serviceAccount = new gcp.serviceaccount.Account("myServiceAccount", {
+    accountId: "awslambdaassignment",
+    project: projectId,
+    displayName: "Service Account for AWS Lambda assignment upload",
+});
+ 
+// Assign roles to the service account
+const roles = [
+    gcpServiceAccountRolePermissions,
+];
+ 
+for (const role of roles) {
+    const binding = new gcp.projects.IAMMember(`myServiceAccountBinding-${role}`, {
+        role: role,
+        member: serviceAccount.email.apply(email => `serviceAccount:${email}`),
+        project: projectId,
+    });
+}
+ 
+// Create Access Keys for the Google Service Account
+const serviceAccountKey = new gcp.serviceaccount.Key("myServiceAccountKey", {
+    serviceAccountId: serviceAccount.name,
+});
+ 
+const privateKeyAsString = pulumi.interpolate`${serviceAccountKey.privateKey}`;
+ 
+const privateKeyPlainString = privateKeyAsString.apply(value => {
+    return value;
+});
+ 
+// Configure IAM so that the AWS Lambda can be run.
+const lambdaIAMRole = new aws.iam.Role("lambdaIAMRole", {
+    assumeRolePolicy: {
+       Version: "2012-10-17",
+       Statement: [{
+          Action: "sts:AssumeRole",
+          Principal: {
+             Service: "lambda.amazonaws.com",
+          },
+          Effect: "Allow",
+          Sid: "",
+       }],
+    },
+});
+ 
+// Attach the CloudWatch Policy to the IAM Role
+const lambdacloudWatchPolicyAttachment = new aws.iam.PolicyAttachment("lambdacloudWatchPolicyAttachment", {
+    policyArn: lambdaIAMRoleCloudwatchPolicyARN,
+    roles: [lambdaIAMRole.name],
+});
+ 
+// Attach the DynamoDB Policy to the IAM Role
+const lambdaDynamoDBPolicyAttachment = new aws.iam.PolicyAttachment("lambdaDynamoDBPolicyAttachment", {
+    policyArn: lambdaIAMRoleDynamoDBPolicyARN,
+    roles: [lambdaIAMRole.name],
+});
+ 
+const dynamoDBTable = new aws.dynamodb.Table("dynamoDBTableName", {
+    name: dynamoDBTableName,
+    attributes: [
+        { name: "uniqueId", type: "S"},
+    ],
+    hashKey: "uniqueId",
+    readCapacity: 5,
+    writeCapacity: 5,
+});
+ 
+// Define your AWS Lambda function
+const lambdaFunction = new aws.lambda.Function("lambdaFunction", {
+    role: lambdaIAMRole.arn,
+    handler: "index.handler",
+    timeout: 300,
+    runtime: "nodejs16.x",
+    code: new pulumi.asset.AssetArchive({
+        ".": new pulumi.asset.FileArchive(path.join(lambdaFilePath)),
+    }),
+    //code: new pulumi.asset.FileArchive(lambdaFilePath),
+    environment : {
+        variables: {
+            DynamoDBName:dynamoDBTable.name,
+            domainName: emailDomainName,
+            bucketName: bucket.name,
+            privateKey: privateKeyPlainString,
+            MAILGUN_API_KEY: mailGunAPIKEY
+        },
+    },
+});
+ 
+// Subscribe Lambda function to SNS topic
+const snsSubscription = new aws.sns.TopicSubscription("lambdaSubscription", {
+    protocol: "lambda",
+    topic: snsTopicArn,
+    endpoint: lambdaFunction.arn,
+});
+ 
+const lambdaTriggerPoint = new aws.lambda.Permission("lambdaTriggerFunction", {
+    action: "lambda:InvokeFunction",
+    function: lambdaFunction.name,
+    principal: "sns.amazonaws.com",
+    sourceArn: snsTopic.arn,
+});
  
 provisioner()
