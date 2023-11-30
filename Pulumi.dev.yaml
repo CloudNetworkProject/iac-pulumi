@@ -74,4 +74,5 @@ config:
   iac-aws:autoScalingDesiredCapacity: 1
   iac-aws:loadBalancerSecurityGroupName: webAppLoadBalancerSecurityGroup
   iac-aws:loadBalancerAllowedIngressPorts: "80,443"
+  iac-aws:ec2IAMRoleSNSPolicyARN: "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
 
