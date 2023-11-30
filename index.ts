@@ -340,6 +340,12 @@ sudo systemctl restart csye6225_webapp
             role: ec2Role.name,
             policyArn: cloudWatchAgentServerPolicy.arn,
         });
+
+        const ec2IAMRoleSNSPolicyARN = config.require("ec2IAMRoleSNSPolicyARN");
+        const snsPolicyAttachment = new aws.iam.PolicyAttachment("SNSPolicyAttachment", {
+            policyArn: ec2IAMRoleSNSPolicyARN,
+            roles: [ec2Role.name],
+        });
  
         // Create the Instance Profile for the Role
         const instanceProfile = new aws.iam.InstanceProfile(instanceProfileName, {
