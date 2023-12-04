@@ -4,13 +4,11 @@ import * as ip from "ip";
 import * as gcp from "@pulumi/gcp";
 import * as path from "path";
  
+
 //Create an SNS topic
 
- 
-
- 
 const config = new pulumi.Config("iac-aws");
- 
+const sslCertificateARN = config.require("sslCertificateARN");
 const vpcName = config.require("vpc_name");
 const vpcCidr = config.require("vpc_cidr");
 const vpcInstanceTenancy = config.require("vpc_instance_tenancy");
@@ -72,6 +70,7 @@ const autoScalingMinSize = config.getNumber("autoScalingMinSize") || 1;
 const autoScalingMaxSize = config.getNumber("autoScalingMaxSize") || 3;
 const autoScalingDesiredCapacity = config.getNumber("autoScalingDesiredCapacity") || 1;
 const loadBalancerAllowedIngressPorts = config.require("loadBalancerAllowedIngressPorts").split(",");
+const ec2IAMRoleSNSPolicyARN = config.require("ec2IAMRoleSNSPolicyARN");
 
 
 const snsTopic = new aws.sns.Topic(snsTopicName);
@@ -321,7 +320,7 @@ sudo systemctl restart csye6225_webapp
                     {
                         Effect: "Allow",
                         Action: "ssm:GetParameter",
-                        Resource: "arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*",
+                        Resource: "arn:aws:ssm:::parameter/AmazonCloudWatch-*",
                     },
                 ],
             },
@@ -341,7 +340,6 @@ sudo systemctl restart csye6225_webapp
             policyArn: cloudWatchAgentServerPolicy.arn,
         });
 
-        const ec2IAMRoleSNSPolicyARN = config.require("ec2IAMRoleSNSPolicyARN");
         const snsPolicyAttachment = new aws.iam.PolicyAttachment("SNSPolicyAttachment", {
             policyArn: ec2IAMRoleSNSPolicyARN,
             roles: [ec2Role.name],
@@ -351,28 +349,29 @@ sudo systemctl restart csye6225_webapp
         const instanceProfile = new aws.iam.InstanceProfile(instanceProfileName, {
             role: ec2Role.name,
         });
-        const ec2Instance = await new aws.ec2.Instance(ec2Name, {
-            instanceType: instanceType,
-            ami: imageId,
-            keyName: keyName,
-            subnetId: publicSubnets[0]?.id,
-            vpcSecurityGroupIds: [appSecurityGroup.id],
-            userData: userDataScript,
-            iamInstanceProfile: instanceProfile.name,
-            disableApiTermination: config.getBoolean("disableApiTermination"),
-            rootBlockDevice: {
-                volumeSize: volumeSize!,
-                volumeType: volumeType,
-                deleteOnTermination: deleteOnTermination!,
-            },
-            tags: {
-                Name: ec2Name,
-            },
-        });
+        // const ec2Instance = await new aws.ec2.Instance(ec2Name, {
+        //     instanceType: instanceType,
+        //     ami: imageId,
+        //     keyName: keyName,
+        //     subnetId: publicSubnets[0]?.id,
+        //     vpcSecurityGroupIds: [appSecurityGroup.id],
+        //     userData: userDataScript,
+        //     iamInstanceProfile: instanceProfile.name,
+        //     disableApiTermination: config.getBoolean("disableApiTermination"),
+        //     rootBlockDevice: {
+        //         volumeSize: volumeSize!,
+        //         volumeType: volumeType,
+        //         deleteOnTermination: deleteOnTermination!,
+        //     },
+        //     tags: {
+        //         Name: ec2Name,
+        //     },
+        // });
  
         const userDataEncoded = userDataScript.apply(ud => Buffer.from(ud).toString('base64'));
  
         const launchTemplate = new aws.ec2.LaunchTemplate(launchConfigurationName, {
+            name: "webapplaunchtemplate",
             imageId: imageId,
             instanceType: instanceType,
             keyName: keyName,
@@ -405,6 +404,7 @@ sudo systemctl restart csye6225_webapp
         });
  
         const autoScalingGroup = new aws.autoscaling.Group(autoScalingGroupName, {
+            name: "webappautoscalegroup",
             vpcZoneIdentifiers: publicSubnets.map(subnet => subnet.id),
             maxSize: autoScalingMaxSize,
             minSize: autoScalingMinSize,
@@ -474,7 +474,7 @@ sudo systemctl restart csye6225_webapp
             actionsEnabled: true
         });
  
-        const publicIp = ec2Instance.publicIp;
+        // const publicIp = ec2Instance.publicIp;
  
         // Application Load Balancer
         const alb = new aws.lb.LoadBalancer("appLoadBalancer", {
@@ -488,8 +488,10 @@ sudo systemctl restart csye6225_webapp
         
         const listener = new aws.lb.Listener("listener", {
             loadBalancerArn: alb.arn,
-            port: 80,
-            protocol: "HTTP",
+            port: 443,
+            protocol: "HTTPS",
+            sslPolicy: "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            certificateArn: sslCertificateARN,
             defaultActions: [{
                 type: "forward",
                 targetGroupArn: targetGroup.arn,
@@ -652,4 +654,5 @@ const lambdaTriggerPoint = new aws.lambda.Permission("lambdaTriggerFunction", {
     sourceArn: snsTopic.arn,
 });
  
+
 provisioner()
