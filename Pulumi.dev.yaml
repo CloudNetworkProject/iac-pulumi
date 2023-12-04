@@ -37,13 +37,13 @@ config:
   iac-aws:allowedEgressCIDRs: "0.0.0.0/0"
   iac-aws:instanceType: t2.micro
   iac-aws:imageId: ami-072d24b1e721c100e
-  iac-aws:keyName: ec2_dev_key
+  iac-aws:keyName: ec2_demo_key
   iac-aws:volumeSize: 25
   iac-aws:volumeType: gp2
   iac-aws:deleteOnTermination: "true"
   iac-aws:shutdownBehavior: stop
   iac-aws:disableApiTermination: "false"
-  iac-aws:ec2Name: EC2DevRDS
+  iac-aws:ec2Name: EC2DemoRDS
   iac-aws:envType: pulumi
   iac-aws:dbPort: 5432
   iac-aws:dbUser: csye6225
@@ -58,9 +58,9 @@ config:
   iac-aws:dbParameterGroupName: customdb-parameter-group
   iac-aws:allocatedStorage: 20
   iac-aws:applicationPort: "8080"
-  iac-aws:domainName: "dev.chanducloud.me"
+  iac-aws:domainName: "demo.chanducloud.me"
   iac-aws:route53ARecordName: route53ARecordName
-  iac-aws:hostedZoneId: "Z098998426M4YR44FSTVB"
+  iac-aws:hostedZoneId: "Z1010655ZZEEB7TBHH58"
   iac-aws:ttl: 60
   iac-aws:cloudWatchAgentServerPolicyName: "CloudWatchAgentServerPolicy"
   iac-aws:ec2RoleName: "ec2Role"
@@ -75,4 +75,5 @@ config:
   iac-aws:loadBalancerSecurityGroupName: webAppLoadBalancerSecurityGroup
   iac-aws:loadBalancerAllowedIngressPorts: "80,443"
   iac-aws:ec2IAMRoleSNSPolicyARN: "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
+  iac-aws:sslCertificateARN: arn:aws:acm:us-east-1:271179645293:certificate/6d97519e-8366-499a-9a08-b84d73eda989 # We don't store password in plaintext in yaml.
 
